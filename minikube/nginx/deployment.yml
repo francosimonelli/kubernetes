@@ -1,0 +1,74 @@
+########################### NAMESPACES ################################
+#######################################################################
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx
+########################### NGINX ################################
+#####################################################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: nginx
+spec:
+  ports:
+  - nodePort: 30001
+    name: nginx-service
+    port: 80
+    targetPort: 80
+  selector:
+    app: nginx
+  type: NodePort
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: nginx
+data:
+  nginx.conf: '
+events {
+}
+http {
+   server {
+       listen 80;
+       location / {
+           return 200 "Hello world!";
+       }
+   }
+}
+'
+
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: nginx
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx 
+        image: nginx:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            memory: 512Mi
+            cpu: "1"      
+
+
