@@ -1,0 +1,5 @@
+- name: Test ping
+  hosts: localhost
+  tasks:
+   - name: Get IP
+     shell: hostname -i  
